@@ -4,8 +4,6 @@
  * @author Ben Ceglowski
  * @Contributer Esben JM
  */
-
-
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     define('VanillaModal', function () {
@@ -21,12 +19,13 @@
   /**
    * @param {Object} [userSettings]
    */
-  constructor(userSettings) {
+  constructor(userSettings, html) {
     
     this.$$ = {
+      templ : '<div class="modal"><div class="modal__inner"><a rel="modal:close"><i class="navicon navicon--close">close</i></a><header class="modal__header"></header><article class="modal__content"></article><footer class="modal__footer"></footer></div></div>',
       modal : '.modal',
-      modalInner : '.modal-inner',
-      modalContent : '.modal-content',
+      modalInner : '.modal__inner',
+      modalContent : '.modal__content',
       open : '[rel="modal:open"]',
       close : '[rel="modal:close"]',
       page : 'body',
@@ -42,14 +41,18 @@
       onClose : function() {}
     };
     
-    this._applyUserSettings(userSettings);
+    this._applyUserSettings(userSettings, html);
+    this.fractionModal = this._turnIntoHtml(this.$$.templ);
     this.error = false;
     this.isOpen = false;
     this.current = null;
+    this.content = html ? this._turnIntoHtml(html) : null;
+    this.isHtml = this.content ? true : false; 
     this.open = this._open.bind(this);
     this.close = this._close.bind(this);
     this.$$.transitionEnd = this._transitionEndVendorSniff();
     this.$ = this._setupDomNodes();
+    if(this.isHtml) { this._initContent(); }
     
     if (!this.error) {
       this._addLoadedCssClass();
@@ -102,16 +105,27 @@
     }
     return node;
   }
-  
+
+  /**
+   * @param {String} htmlString
+   */
+  _turnIntoHtml(html) {
+    var parser = new DOMParser();
+    return parser.parseFromString(html, "text/xml");
+  }
+
   _setupDomNodes() {
     var $ = {};
-    $.modal = this._getNode(this.$$.modal);
+    $.modal = this._getNode(this.$$.modal, this.content ? this.fractionModal : null);
     $.page = this._getNode(this.$$.page);
-    $.modalInner = this._getNode(this.$$.modalInner, this.modal);
-    $.modalContent = this._getNode(this.$$.modalContent, this.modal);
+    $.modalInner = this._getNode(this.$$.modalInner, this.content ? this.fractionModal : this.modal);
+    $.modalContent = this._getNode(this.$$.modalContent, this.content ? this.fractionModal : this.modal);
     return $;
   }
-  
+  _initContent() {
+    this.$.modalContent.appendChild(this.content.documentElement);
+    
+  }
   _addLoadedCssClass() {
     this._addClass(this.$.page, this.$$.loadClass);
   }
@@ -151,6 +165,7 @@
     this.$.page.removeAttribute('data-current-modal');
   }
   
+  
   /**
    * @param {mixed} e
    */
@@ -169,10 +184,14 @@
    */
   _open(e) {
     this._releaseNode();
-    this.current = this._getElementContext(e);
-    if (this.current instanceof HTMLElement === false) return console.error('VanillaModal target must exist on page.');
+    //if(!this.content) { this._releaseNode(); } else { this.$.modalContent.innerHtml = ""; }
+    this.current = this.isHtml ? this.content : this._getElementContext(e);
+    if (!this.content && this.current instanceof HTMLElement === false) return console.error('VanillaModal target must exist on page.');
     if (typeof this.$$.onBeforeOpen === 'function') this.$$.onBeforeOpen.call(this);
-    this._captureNode();
+    this._captureNode(); 
+    if(this.content) { 
+      this.$.page.appendChild(this.$.modal); 
+    }
     this._addClass(this.$.page, this.$$.class);
     this._setOpenId();
     this.isOpen = true;
@@ -206,7 +225,11 @@
   
   _closeModal() {
     this._removeOpenId(this.$.page);
-    this._releaseNode();
+    if(!this.content) { 
+      this._releaseNode(); 
+    } else {
+      this.$.modal.remove();
+    }
     this.isOpen = false;
     this.current = null;
     if (typeof this.$$.onClose === 'function') this.$$.onClose.call(this);
@@ -221,14 +244,16 @@
   }
   
   _captureNode() {
-    while (this.current.childNodes.length > 0) {
+    var cur = this.isHtml ? this.content : this.current;
+    while (cur.childNodes.length > 0) {
       this.$.modalContent.appendChild(this.current.childNodes[0]);
     }
   }
   
   _releaseNode() {
+    var cur = this.isHtml ? this.content : this.current;
     while (this.$.modalContent.childNodes.length > 0) {
-      this.current.appendChild(this.$.modalContent.childNodes[0]);
+      cur.appendChild(this.$.modalContent.childNodes[0]);
     }
   }
   
