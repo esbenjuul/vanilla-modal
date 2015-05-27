@@ -7,14 +7,29 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
 /**
  * @class VanillaModal
- * @version 1.1.2
+ * @version 1.1.3
  * @author Ben Ceglowski
+ * @Contributer Esben JM
  */
-var VanillaModal = (function () {
+
+
+(function (factory) {
+  if (typeof define === "function" && define.amd) {
+    define("VanillaModal", function () {
+      return factory;
+    });
+  } else if (typeof module !== "undefined" && module.exports) {
+    module.exports = factory;
+  } else {
+    window.VanillaModal = factory;
+  }
+})((function () {
+  var _class =
+
   /**
    * @param {Object} [userSettings]
    */
-  function VanillaModal(userSettings) {
+  function (userSettings) {
     this.$$ = {
       modal: ".modal",
       modalInner: ".modal-inner",
@@ -49,9 +64,9 @@ var VanillaModal = (function () {
     } else {
       console.error("Please fix errors before proceeding.");
     }
-  }
+  };
 
-  _prototypeProperties(VanillaModal, null, {
+  _prototypeProperties(_class, null, {
     _applyUserSettings: {
 
       /**
@@ -422,17 +437,5 @@ var VanillaModal = (function () {
     }
   });
 
-  return VanillaModal;
-})();
-
-(function () {
-  if (typeof define === "function" && define.amd) {
-    define("VanillaModal", function () {
-      return VanillaModal;
-    });
-  } else if (typeof module !== "undefined" && module.exports) {
-    module.exports = VanillaModal;
-  } else {
-    window.VanillaModal = VanillaModal;
-  }
-})();
+  return _class;
+})());

@@ -1,9 +1,22 @@
 /**
  * @class VanillaModal
- * @version 1.1.2
+ * @version 1.1.3
  * @author Ben Ceglowski
+ * @Contributer Esben JM
  */
-class VanillaModal {
+
+
+(function(factory) {
+  if (typeof define === 'function' && define.amd) {
+    define('VanillaModal', function () {
+      return factory;
+    });
+  } else if (typeof module !== 'undefined' && module.exports) {
+    module.exports = factory;
+  } else {
+    window.VanillaModal = factory;
+  }
+})(class {
   
   /**
    * @param {Object} [userSettings]
@@ -312,16 +325,5 @@ class VanillaModal {
     
   }
    
-}
+});
 
-(function() {
-  if (typeof define === 'function' && define.amd) {
-    define('VanillaModal', function () {
-      return VanillaModal;
-    });
-  } else if (typeof module !== 'undefined' && module.exports) {
-    module.exports = VanillaModal;
-  } else {
-    window.VanillaModal = VanillaModal;
-  }
-})();
