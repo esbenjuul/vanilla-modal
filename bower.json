@@ -1,0 +1,8 @@
+{
+  "name": "Vanilla-modal",
+  "version": "0.2.1",
+  "main": "dist/vanilla-modal.js",
+  "ignore": [
+    "node_modules"
+  ]
+}
