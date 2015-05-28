@@ -28,8 +28,8 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
    */
   function (userSettings, html) {
     this.$$ = {
-      templ: "<div class=\"overlay\"><div class=\"modal__inner\"><a rel=\"modal:close\"><i class=\"navicon navicon--close\">close</i></a><header class=\"modal__header\"></header><article class=\"modal__content\"></article><footer class=\"modal__footer\"><button class=\"button button--cancel modal__cancel\">Cancel</button><button class=\"button button--primary modal__ok\">Ok</button></footer></div></div>",
-      modal: ".overlay",
+      templ: "<div class=\"modal\"><div class=\"modal__inner\"><a rel=\"modal:close\"><i class=\"navicon navicon--close\">close</i></a><header class=\"modal__header\"></header><article class=\"modal__content\"></article><footer class=\"modal__footer\"><button class=\"button button--cancel modal__cancel\">Cancel</button><button class=\"button button--primary modal__ok\">Ok</button></footer></div></div>",
+      modal: ".modal",
       modalInner: ".modal__inner",
       modalContent: ".modal__content",
       footer: ".modal__footer",
@@ -55,11 +55,11 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
     };
 
     this._applyUserSettings(userSettings, html);
-    this.fractionModal = this._turnIntoHtml(this.$$.templ);
+    this.fractionModal = this._createDOMElement(this.$$.templ);
     this.error = false;
     this.isOpen = false;
     this.current = null;
-    this.content = html ? this._turnIntoHtml(html) : null;
+    this.content = html ? this._createDOMElement(html) : null;
     this.isHtml = this.content ? true : false;
     this.open = this._open.bind(this);
     this.close = this._close.bind(this);
@@ -148,14 +148,21 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
       enumerable: true,
       configurable: true
     },
-    _turnIntoHtml: {
+    _createDOMElement: {
 
       /**
        * @param {String} htmlString
        */
-      value: function TurnIntoHtml(html) {
-        var parser = new DOMParser();
-        return parser.parseFromString(html, "text/xml");
+      value: function CreateDOMElement(html) {
+        var frame = document.createElement("iframe");
+        frame.style.display = "none";
+        document.body.appendChild(frame);
+        frame.contentDocument.open();
+        frame.contentDocument.write(html);
+        frame.contentDocument.close();
+        var el = frame.contentDocument.body.firstChild;
+        document.body.removeChild(frame);
+        return el;
       },
       writable: true,
       enumerable: true,
@@ -164,7 +171,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
     _setupDomNodes: {
       value: function SetupDomNodes() {
         var $ = {};
-        $.modal = this._getNode(this.$$.modal, this.isHtml ? this.fractionModal : null);
+        $.modal = this.isHtml ? this.fractionModal : this._getNode(this.$$.modal, null);
         $.page = this._getNode(this.$$.page);
         $.modalInner = this._getNode(this.$$.modalInner, this.isHtml ? this.fractionModal : this.modal);
         $.modalContent = this._getNode(this.$$.modalContent, this.isHtml ? this.fractionModal : this.modal);
