@@ -22,8 +22,8 @@
   constructor(userSettings, html) {
     
     this.$$ = {
-      templ : '<div class="modal"><div class="modal__inner"><a rel="modal:close"><i class="navicon navicon--close">close</i></a><header class="modal__header"></header><article class="modal__content"></article><footer class="modal__footer"></footer></div></div>',
-      modal : '.modal',
+      templ : '<div class="modal"><div class="modal__inner"><a rel="modal:close"><i class="navicon navicon--close">close</i></a><header class="modal__header"></header><article class="modal__content"></article><footer class="modal__footer"><button class="button button--cancel">Cancel</button><button class="button button--primary">Ok</button></footer></div></div>',
+      modal : 'modal',
       modalInner : '.modal__inner',
       modalContent : '.modal__content',
       open : '[rel="modal:open"]',
@@ -31,6 +31,8 @@
       page : 'body',
       class : 'modal-visible',
       loadClass : 'vanilla-modal',
+      footer: 'modal__footer', 
+      showFooter: false;
       clickOutside : true,
       closeKey : 27,
       transitions : true,
@@ -38,7 +40,8 @@
       onBeforeOpen : function() {},
       onBeforeClose : function() {},
       onOpen : function() {},
-      onClose : function() {}
+      onClose : function() {},
+      onCancel : function() {}
     };
     
     this._applyUserSettings(userSettings, html);
@@ -116,14 +119,15 @@
 
   _setupDomNodes() {
     var $ = {};
-    $.modal = this._getNode(this.$$.modal, this.content ? this.fractionModal : null);
+    $.modal = this._getNode(this.$$.modal, this.isHtml ? this.fractionModal : null);
     $.page = this._getNode(this.$$.page);
-    $.modalInner = this._getNode(this.$$.modalInner, this.content ? this.fractionModal : this.modal);
-    $.modalContent = this._getNode(this.$$.modalContent, this.content ? this.fractionModal : this.modal);
+    $.modalInner = this._getNode(this.$$.modalInner, this.isHtml ? this.fractionModal : this.modal);
+    $.modalContent = this._getNode(this.$$.modalContent, this.isHtml ? this.fractionModal : this.modal);
+    $.footer = this._getNode(this.$$.footer, this.isHtml ? this.fractionModal : this.modal)
     return $;
   }
   _initContent() {
-    this.$.modalContent.appendChild(this.content.documentElement);
+    //this.$.modalContent.appendChild(this.content.documentElement);
     
   }
   _addLoadedCssClass() {
@@ -184,12 +188,11 @@
    */
   _open(e) {
     this._releaseNode();
-    //if(!this.content) { this._releaseNode(); } else { this.$.modalContent.innerHtml = ""; }
     this.current = this.isHtml ? this.content : this._getElementContext(e);
     if (!this.content && this.current instanceof HTMLElement === false) return console.error('VanillaModal target must exist on page.');
     if (typeof this.$$.onBeforeOpen === 'function') this.$$.onBeforeOpen.call(this);
     this._captureNode(); 
-    if(this.content) { 
+    if(this.isHtml) { 
       this.$.page.appendChild(this.$.modal); 
     }
     this._addClass(this.$.page, this.$$.class);
@@ -225,7 +228,7 @@
   
   _closeModal() {
     this._removeOpenId(this.$.page);
-    if(!this.content) { 
+    if(!this.isHtml) { 
       this._releaseNode(); 
     } else {
       this.$.modal.remove();
@@ -323,16 +326,15 @@
    * @private {Function} add
    */
   _events() {
-    
     let _closeKeyHandler = this._closeKeyHandler.bind(this);
     let _outsideClickHandler = this._outsideClickHandler.bind(this);
     let _delegateOpen = this._delegateOpen.bind(this);
     let _delegateClose = this._delegateClose.bind(this);
-    
+
     var add = function() {
       this.$.modal.addEventListener('click', _outsideClickHandler);
       document.addEventListener('keydown', _closeKeyHandler);
-      document.addEventListener('click', _delegateOpen);
+      if(!this.delegateOpenEvents){ document.addEventListener('click', _delegateOpen); }
       document.addEventListener('click', _delegateClose);
     };
   
@@ -340,15 +342,13 @@
       this.close();
       this.$.modal.removeEventListener('click', _outsideClickHandler);
       document.removeEventListener('keydown', _closeKeyHandler);
-      document.removeEventListener('click', _delegateOpen);
+      if(!this.delegateOpenEvents){ document.removeEventListener('click', _delegateOpen); }
       document.removeEventListener('click', _delegateClose);
     };
     
     return {
       add : add.bind(this)
     };
-    
   }
-   
 });
 

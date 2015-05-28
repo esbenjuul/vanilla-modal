@@ -29,7 +29,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
    */
   function (userSettings, html) {
     this.$$ = {
-      templ: "<div class=\"modal\"><div class=\"modal__inner\"><a rel=\"modal:close\"><i class=\"navicon navicon--close\">close</i></a><header class=\"modal__header\"></header><article class=\"modal__content\"></article><footer class=\"modal__footer\"></footer></div></div>",
+      templ: "<div class=\"modal\"><div class=\"modal__inner\"><a rel=\"modal:close\"><i class=\"navicon navicon--close\">close</i></a><header class=\"modal__header\"></header><article class=\"modal__content\"></article><footer class=\"modal__footer\"><button class=\"button button--cancel\">Cancel</button><button class=\"button button--primary\">Ok</button></footer></div></div>",
       modal: ".modal",
       modalInner: ".modal__inner",
       modalContent: ".modal__content",
@@ -145,10 +145,10 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
     _setupDomNodes: {
       value: function SetupDomNodes() {
         var $ = {};
-        $.modal = this._getNode(this.$$.modal, this.content ? this.fractionModal : null);
+        $.modal = this._getNode(this.$$.modal, this.isHtml ? this.fractionModal : null);
         $.page = this._getNode(this.$$.page);
-        $.modalInner = this._getNode(this.$$.modalInner, this.content ? this.fractionModal : this.modal);
-        $.modalContent = this._getNode(this.$$.modalContent, this.content ? this.fractionModal : this.modal);
+        $.modalInner = this._getNode(this.$$.modalInner, this.isHtml ? this.fractionModal : this.modal);
+        $.modalContent = this._getNode(this.$$.modalContent, this.isHtml ? this.fractionModal : this.modal);
         return $;
       },
       writable: true,
@@ -156,9 +156,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
       configurable: true
     },
     _initContent: {
-      value: function InitContent() {
-        this.$.modalContent.appendChild(this.content.documentElement);
-      },
+      value: function InitContent() {},
       writable: true,
       enumerable: true,
       configurable: true
@@ -250,12 +248,12 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
        */
       value: function Open(e) {
         this._releaseNode();
-        //if(!this.content) { this._releaseNode(); } else { this.$.modalContent.innerHtml = ""; }
+
         this.current = this.isHtml ? this.content : this._getElementContext(e);
         if (!this.content && this.current instanceof HTMLElement === false) return console.error("VanillaModal target must exist on page.");
         if (typeof this.$$.onBeforeOpen === "function") this.$$.onBeforeOpen.call(this);
         this._captureNode();
-        if (this.content) {
+        if (this.isHtml) {
           this.$.page.appendChild(this.$.modal);
         }
         this._addClass(this.$.page, this.$$["class"]);
@@ -304,7 +302,7 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
     _closeModal: {
       value: function CloseModal() {
         this._removeOpenId(this.$.page);
-        if (!this.content) {
+        if (!this.isHtml) {
           this._releaseNode();
         } else {
           this.$.modal.remove();
@@ -452,7 +450,9 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
         var add = function () {
           this.$.modal.addEventListener("click", _outsideClickHandler);
           document.addEventListener("keydown", _closeKeyHandler);
-          document.addEventListener("click", _delegateOpen);
+          if (!this.delegateOpenEvents) {
+            document.addEventListener("click", _delegateOpen);
+          }
           document.addEventListener("click", _delegateClose);
         };
 
@@ -460,7 +460,9 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
           this.close();
           this.$.modal.removeEventListener("click", _outsideClickHandler);
           document.removeEventListener("keydown", _closeKeyHandler);
-          document.removeEventListener("click", _delegateOpen);
+          if (!this.delegateOpenEvents) {
+            document.removeEventListener("click", _delegateOpen);
+          }
           document.removeEventListener("click", _delegateClose);
         };
 
@@ -476,3 +478,4 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
   return _class;
 })());
+//this.$.modalContent.appendChild(this.content.documentElement);

@@ -35,13 +35,13 @@
     </div>
     <button class="open-custom-modal">Open custom modal</button>
     
-    <div class="modal-old">
+    <!-- <div class="modal">
       <div class="modal__inner">
         <a rel="modal:close">&times;</a>
         <div class="modal__content"></div>
       </div>
     </div>
-
+ -->
 
     
     
@@ -49,23 +49,23 @@
    
 
     <script>
-    var modal = new VanillaModal({
-      onBeforeOpen : function() {
-        console.log('onBeforeOpen hook');
-      },
-      onOpen : function() {
-        console.log('onOpen hook');
-      },
-      onBeforeClose : function() {
-        console.log('onBeforeClose hook');
-      },
-      onClose : function() {
-        console.log('onClose hook');
-      },
-      modal: ".modal-old"
-    });
+    // var modal = new VanillaModal({
+    //   onBeforeOpen : function() {
+    //     console.log('onBeforeOpen hook');
+    //   },
+    //   onOpen : function() {
+    //     console.log('onOpen hook');
+    //   },
+    //   onBeforeClose : function() {
+    //     console.log('onBeforeClose hook');
+    //   },
+    //   onClose : function() {
+    //     console.log('onClose hook');
+    //   },
+    //   modal: ".modal"
+    // });
 
-    var modal2 = new VanillaModal({"open":".open-modal"}, "<div>text test</div>");
+    var modal2 = new VanillaModal({"open":".open-modal", "delegateOpenEvents":false }, "<div>text test</div>");
     console.log(modal2);
     document.querySelector(".open-custom-modal").addEventListener("click", openModal, false);
     function openModal(){
