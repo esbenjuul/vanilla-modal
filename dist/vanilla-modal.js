@@ -467,10 +467,12 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
         if (e.target == this.$.okBtn) {
           e.preventDefault();
           if (typeof this.$$.onOk === "function") this.$$.onOk.call(this);
+          return this.close();
         }
         if (e.target == this.$.cancelBtn) {
           e.preventDefault();
           if (typeof this.$$.cancelOk === "function") this.$$.cancelOk.call(this);
+          return this.close();
         }
       },
       writable: true,
