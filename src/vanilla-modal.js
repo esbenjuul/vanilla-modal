@@ -37,6 +37,7 @@
       closeKey : 27,
       transitions : true,
       transitionEnd : null,
+      delegateOpenEvents: true,
       onBeforeOpen : function() {},
       onBeforeClose : function() {},
       onOpen : function() {},
