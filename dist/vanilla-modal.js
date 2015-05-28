@@ -38,14 +38,18 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
       page: "body",
       "class": "modal-visible",
       loadClass: "vanilla-modal",
+      footer: "modal__footer",
+      showFooter: false,
       clickOutside: true,
       closeKey: 27,
       transitions: true,
       transitionEnd: null,
+      delegateOpenEvents: true,
       onBeforeOpen: function () {},
       onBeforeClose: function () {},
       onOpen: function () {},
-      onClose: function () {}
+      onClose: function () {},
+      onCancel: function () {}
     };
 
     this._applyUserSettings(userSettings, html);
@@ -59,12 +63,12 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
     this.close = this._close.bind(this);
     this.$$.transitionEnd = this._transitionEndVendorSniff();
     this.$ = this._setupDomNodes();
-    if (this.isHtml) {
-      this._initContent();
-    }
+
 
     if (!this.error) {
+      this._trimModal();
       this._addLoadedCssClass();
+
       this._events().add();
     } else {
       console.error("Please fix errors before proceeding.");
@@ -72,6 +76,19 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
   };
 
   _prototypeProperties(_class, null, {
+    _trimModal: {
+      /**
+       * @param {Object} userSettings
+       */
+      value: function TrimModal() {
+        if (!this.$$.showFooter) {
+          this.$.footer.remove();
+        }
+      },
+      writable: true,
+      enumerable: true,
+      configurable: true
+    },
     _applyUserSettings: {
 
       /**
@@ -149,14 +166,9 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
         $.page = this._getNode(this.$$.page);
         $.modalInner = this._getNode(this.$$.modalInner, this.isHtml ? this.fractionModal : this.modal);
         $.modalContent = this._getNode(this.$$.modalContent, this.isHtml ? this.fractionModal : this.modal);
+        $.footer = this._getNode(this.$$.footer, this.isHtml ? this.fractionModal : this.modal);
         return $;
       },
-      writable: true,
-      enumerable: true,
-      configurable: true
-    },
-    _initContent: {
-      value: function InitContent() {},
       writable: true,
       enumerable: true,
       configurable: true
@@ -248,7 +260,6 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
        */
       value: function Open(e) {
         this._releaseNode();
-
         this.current = this.isHtml ? this.content : this._getElementContext(e);
         if (!this.content && this.current instanceof HTMLElement === false) return console.error("VanillaModal target must exist on page.");
         if (typeof this.$$.onBeforeOpen === "function") this.$$.onBeforeOpen.call(this);
@@ -478,4 +489,3 @@ var _prototypeProperties = function (child, staticProps, instanceProps) {
 
   return _class;
 })());
-//this.$.modalContent.appendChild(this.content.documentElement);

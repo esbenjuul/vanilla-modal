@@ -32,7 +32,7 @@
       class : 'modal-visible',
       loadClass : 'vanilla-modal',
       footer: 'modal__footer', 
-      showFooter: false;
+      showFooter: false,
       clickOutside : true,
       closeKey : 27,
       transitions : true,
@@ -56,17 +56,27 @@
     this.close = this._close.bind(this);
     this.$$.transitionEnd = this._transitionEndVendorSniff();
     this.$ = this._setupDomNodes();
-    if(this.isHtml) { this._initContent(); }
+  
     
     if (!this.error) {
+      this._trimModal();
       this._addLoadedCssClass();
+      
       this._events().add();
     } else {
       console.error('Please fix errors before proceeding.');
     }
     
   }
-  
+  /**
+   * @param {Object} userSettings
+   */
+  _trimModal() {
+    if(!this.$$.showFooter) {
+      this.$.footer.remove();
+    }
+  }
+
   /**
    * @param {Object} userSettings
    */
@@ -124,13 +134,10 @@
     $.page = this._getNode(this.$$.page);
     $.modalInner = this._getNode(this.$$.modalInner, this.isHtml ? this.fractionModal : this.modal);
     $.modalContent = this._getNode(this.$$.modalContent, this.isHtml ? this.fractionModal : this.modal);
-    $.footer = this._getNode(this.$$.footer, this.isHtml ? this.fractionModal : this.modal)
+    $.footer = this._getNode(this.$$.footer, this.isHtml ? this.fractionModal : this.modal);
     return $;
   }
-  _initContent() {
-    //this.$.modalContent.appendChild(this.content.documentElement);
-    
-  }
+  
   _addLoadedCssClass() {
     this._addClass(this.$.page, this.$$.loadClass);
   }
