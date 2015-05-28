@@ -65,7 +65,7 @@
     //   modal: ".modal"
     // });
 
-    var modal2 = new VanillaModal({"open":".open-modal", "delegateOpenEvents":false }, "<div>text test</div>");
+    var modal2 = new VanillaModal({"open":".open-modal", "delegateOpenEvents":false, showFooter: true, onOk: function(){ console.log("onOK"); } }, "<div>text test</div>");
     console.log(modal2);
     document.querySelector(".open-custom-modal").addEventListener("click", openModal, false);
     function openModal(){

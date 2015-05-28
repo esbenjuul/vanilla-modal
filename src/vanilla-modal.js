@@ -15,23 +15,24 @@
     window.VanillaModal = factory;
   }
 })(class {
-  
   /**
    * @param {Object} [userSettings]
    */
   constructor(userSettings, html) {
     
     this.$$ = {
-      templ : '<div class="modal"><div class="modal__inner"><a rel="modal:close"><i class="navicon navicon--close">close</i></a><header class="modal__header"></header><article class="modal__content"></article><footer class="modal__footer"><button class="button button--cancel">Cancel</button><button class="button button--primary">Ok</button></footer></div></div>',
-      modal : '.modal',
+      templ : '<div class="overlay"><div class="modal__inner"><a rel="modal:close"><i class="navicon navicon--close">close</i></a><header class="modal__header"></header><article class="modal__content"></article><footer class="modal__footer"><button class="button button--cancel modal__cancel">Cancel</button><button class="button button--primary modal__ok">Ok</button></footer></div></div>',
+      modal : '.overlay',
       modalInner : '.modal__inner',
       modalContent : '.modal__content',
+      footer: '.modal__footer', 
       open : '[rel="modal:open"]',
       close : '[rel="modal:close"]',
+      cancelBtn : '.modal__cancel',
+      okBtn : '.modal__ok',
       page : 'body',
       class : 'modal-visible',
       loadClass : 'vanilla-modal',
-      footer: 'modal__footer', 
       showFooter: false,
       clickOutside : true,
       closeKey : 27,
@@ -42,7 +43,8 @@
       onBeforeClose : function() {},
       onOpen : function() {},
       onClose : function() {},
-      onCancel : function() {}
+      onCancel : function() {},
+      onOk : function() {}
     };
     
     this._applyUserSettings(userSettings, html);
@@ -135,6 +137,8 @@
     $.modalInner = this._getNode(this.$$.modalInner, this.isHtml ? this.fractionModal : this.modal);
     $.modalContent = this._getNode(this.$$.modalContent, this.isHtml ? this.fractionModal : this.modal);
     $.footer = this._getNode(this.$$.footer, this.isHtml ? this.fractionModal : this.modal);
+    $.okBtn = this._getNode(this.$$.okBtn, this.isHtml ? this.fractionModal : this.modal);
+    $.cancelBtn = this._getNode(this.$$.cancelBtn, this.isHtml ? this.fractionModal : this.modal);
     return $;
   }
   
@@ -329,6 +333,21 @@
       return this.close();
     }
   }
+
+   /**
+   * @param {Event} e
+   */
+  _actionsClickHandler(e) {
+    if(e.target == this.$.okBtn) {
+      e.preventDefault();
+      if (typeof this.$$.onOk === 'function') this.$$.onOk.call(this);
+    }
+    if(e.target == this.$.cancelBtn) {
+      e.preventDefault();
+      if (typeof this.$$.cancelOk === 'function') this.$$.cancelOk.call(this);
+    }
+  }
+
   
   /**
    * @private {Function} add
@@ -338,8 +357,10 @@
     let _outsideClickHandler = this._outsideClickHandler.bind(this);
     let _delegateOpen = this._delegateOpen.bind(this);
     let _delegateClose = this._delegateClose.bind(this);
+    let _actionsClickHandler = this._actionsClickHandler.bind(this);
 
     var add = function() {
+      this.$.modal.addEventListener('click', _actionsClickHandler);
       this.$.modal.addEventListener('click', _outsideClickHandler);
       document.addEventListener('keydown', _closeKeyHandler);
       if(!this.delegateOpenEvents){ document.addEventListener('click', _delegateOpen); }
