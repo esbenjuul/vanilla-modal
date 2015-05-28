@@ -23,7 +23,7 @@
     
     this.$$ = {
       templ : '<div class="modal"><div class="modal__inner"><a rel="modal:close"><i class="navicon navicon--close">close</i></a><header class="modal__header"></header><article class="modal__content"></article><footer class="modal__footer"><button class="button button--cancel">Cancel</button><button class="button button--primary">Ok</button></footer></div></div>',
-      modal : 'modal',
+      modal : '.modal',
       modalInner : '.modal__inner',
       modalContent : '.modal__content',
       open : '[rel="modal:open"]',
